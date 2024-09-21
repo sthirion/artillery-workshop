@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "artillery-plugin-metrics-by-endpoint": "^1.0.2",
+    "faker": "^5.2.0"
+  }
+}

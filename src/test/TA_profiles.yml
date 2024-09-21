@@ -1,0 +1,63 @@
+# ASSERTS: npm install -g artillery-plugin-expect
+# METRIC-BY-ENDPOINT: npm install artillery-plugin-metrics-by-endpoint
+config:
+  tls:
+    rejectUnauthorized: false
+  ensure:
+    max: 1000
+    maxErrorRate: 10 # 10%
+  environments:
+    dev:
+      target: "https://api.genderize.io"
+      phases:
+        - name: "Performance test running in {{$environment}}"
+          duration: 1
+          arrivalRate: 1
+      variables:
+        name:
+          - "Karlin"
+          - "Sven"
+    test:
+      target: "https://api.genderize.io"
+      phases:
+        - name: "Performance test running in {{$environment}}"
+          duration: 2
+          arrivalRate: 2
+        - name: "Ramp up load running in {{$environment}}"
+          duration: 4
+          arrivalRate: 2
+          rampTo: 10
+        - name: "Sustained load running in {{$environment}}"
+          duration: 8
+          arrivalRate: 10
+      variables:
+        name:
+          - "Lyle"
+          - "Sasirekka"
+          - "Affan"
+          - "Andrew"
+          - "Karlin"
+          - "Coretta"
+          - "Dan"
+          - "Darryl"
+          - "Faith"
+          - "R"
+          - "Dan"
+  plugins:
+    expect: {}
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+  processor: "../utils/helper-functions.js"
+scenarios:
+  - afterResponse: "percentCalculation"
+    flow:
+      - get:
+          url: "/"
+          qs:
+            name: "{{name}}"
+          capture:
+            - json: "$.gender"
+              as: "response_gender"
+      - log: "There is a {{probability}}% chance that {{FirstName}} {{LastName}} is a {{response_gender}}"
+
+  # Run: artillery run src/test/TA_profiles.yml --environment dev

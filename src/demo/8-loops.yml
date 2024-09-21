@@ -1,0 +1,25 @@
+config:
+  target: https://api.genderize.io
+  phases:
+    - name: "Looping"
+      duration: 1
+      arrivalRate: 1
+  plugins:
+    # expect: {}
+scenarios:
+  - flow:
+    - loop:
+      - get:
+          url: "/"
+          qs:
+            name: "Anna"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: "gender"
+      - log: "loop count: {{ $loopCount }}"
+      count: 5
+      
+  # Run: artillery run -q src/demo/8-loops.yml
+
+  # INFO: https://www.artillery.io/docs/guides/guides/http-reference#loops

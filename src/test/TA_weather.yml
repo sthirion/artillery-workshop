@@ -1,0 +1,45 @@
+# ASSERTS: npm install -g artillery-plugin-expect
+config:
+  target: "https://weatherdbi.herokuapp.com/data/weather"
+  tls:
+    rejectUnauthorized: false
+  ensure:
+    max: 1000
+    maxErrorRate: 10 # 10%
+  variables:
+    city:
+      - "Chicago"
+      - "Madrid"
+      - "Brussels"
+      - "Athens"
+  phases:
+    - name: Warm up
+      duration: 5
+      arrivalRate: 1
+    - name: Ramp up load
+      duration: 10
+      arrivalRate: 2
+      rampTo: 5
+    - name: Sustained load
+      duration: 60
+      arrivalRate: 5
+  plugins:
+    expect: {}
+  processor: "../utils/helper-functions.js"
+scenarios:
+  - name: "VARIABLES - Get weather by city"
+    flow:
+      - get:
+          url: "/{{city}}"
+          expect:
+            statusCode: 200
+          capture:
+            - json: "$.region"
+              as: "region"
+            - json: "$.currentConditions.comment"
+              as: "weather"
+            - json: "$.currentConditions.temp.f"
+              as: "temperature"
+      - log: "It is {{weather}} in {{region}} ({{temperature}} degrees)"
+  
+  # Run: artillery run src/test/TA_weather.yml

@@ -1,0 +1,13 @@
+config:
+  target: https://api.genderize.io
+scenarios:
+  - flow:
+      - get:
+          url: "/"
+          qs:
+            name: "David"
+
+  # Run:    artillery run src/demo/1-scaffolding.yml
+  # Store:  artillery run -o reports/report.json src/demo/1-scaffolding.yml
+  
+  # Report: artillery report reports/report.json

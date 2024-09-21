@@ -1,0 +1,28 @@
+config:
+  target: https://api.genderize.io
+  phases:
+    - duration: 1
+      arrivalRate: 1
+  payload:
+    path: "../resources/names.csv"
+    fields:
+      - "FirstName"
+      - "LastName"
+    order: random #sequence
+    skipHeader: true
+  processor: "../utils/helper-functions.js"
+scenarios:
+  - afterResponse: "percentCalculation"
+    flow:
+      - get:
+          url: "/"
+          qs:
+            name: "{{FirstName}}"
+          capture:
+            - json: "$.gender"
+              as: "gender"
+      - log: "There is a {{probability}}% chance that {{FirstName}} {{LastName}} is a {{gender}}"
+
+  # Run:    artillery run -q src/demo/5-post-request.yml
+
+  # INFO: https://www.artillery.io/docs/guides/guides/http-reference#function-signatures

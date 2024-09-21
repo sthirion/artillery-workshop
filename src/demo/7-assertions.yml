@@ -1,0 +1,22 @@
+config:
+  target: https://api.genderize.io
+  phases:
+    - name: "Functional Testing"
+      duration: 1
+      arrivalRate: 1
+  plugins:
+    expect: {}
+scenarios:
+  - flow:
+    - get:
+        url: "/"
+        qs:
+          name: "Anna"
+        expect:
+          - statusCode: 200
+          - contentType: json
+          - hasProperty: "gender"
+
+# Run: artillery run -q src/demo/7-assertions.yml
+
+# INFO: https://www.artillery.io/docs/guides/plugins/plugin-expectations-assertions#expectations

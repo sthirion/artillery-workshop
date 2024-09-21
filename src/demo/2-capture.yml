@@ -1,0 +1,18 @@
+config:
+  target: https://api.genderize.io
+scenarios:
+  - flow:
+      - get:
+          url: "/"
+          qs:
+            name: "David"
+          capture:
+            - json: "$.probability"
+              as: "response_probability"
+            - json: "$.gender"
+              as: "response_gender"
+      - log: "There is a {{response_probability}} in 1 change that David is a {{response_gender}}"
+
+  # Run:    artillery run -q src/demo/2-capture.yml
+
+  # INFO: https://www.artillery.io/docs/guides/guides/http-reference#syntax

@@ -1,0 +1,28 @@
+config:
+  target: https://api.genderize.io
+  phases:
+    - duration: 5
+      arrivalRate: 3
+  payload:
+    path: "../resources/names.csv"
+    fields:
+      - "FirstName"
+      - "LastName"
+    order: random #sequence
+    skipHeader: true
+scenarios:
+  - flow:
+      - get:
+          url: "/"
+          qs:
+            name: "{{FirstName}}"
+          capture:
+            - json: "$.probability"
+              as: "response_probability"
+            - json: "$.gender"
+              as: "response_gender"
+      - log: "There is a {{response_probability}} in 1 change that {{FirstName}} {{LastName}} is a {{response_gender}}"
+
+  # Run:    artillery run -q src/demo/4-csv.yml
+
+  # INFO: https://www.artillery.io/docs/guides/guides/test-script-reference#payload---data-from-csv

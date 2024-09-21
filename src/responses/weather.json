@@ -1,0 +1,129 @@
+{
+    "region": "Chicago, IL",
+    "currentConditions": {
+        "dayhour": "Monday 4:00 PM",
+        "temp": {
+            "c": 23,
+            "f": 73
+        },
+        "precip": "0%",
+        "humidity": "34%",
+        "wind": {
+            "km": 23,
+            "mile": 14
+        },
+        "iconURL": "https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png",
+        "comment": "Mostly sunny"
+    },
+    "next_days": [
+        {
+            "day": "Monday",
+            "comment": "Scattered showers",
+            "max_temp": {
+                "c": 23,
+                "f": 74
+            },
+            "min_temp": {
+                "c": 9,
+                "f": 48
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/rain_s_cloudy.png"
+        },
+        {
+            "day": "Tuesday",
+            "comment": "Rain",
+            "max_temp": {
+                "c": 11,
+                "f": 52
+            },
+            "min_temp": {
+                "c": 9,
+                "f": 48
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/rain.png"
+        },
+        {
+            "day": "Wednesday",
+            "comment": "Showers",
+            "max_temp": {
+                "c": 16,
+                "f": 61
+            },
+            "min_temp": {
+                "c": 4,
+                "f": 40
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/rain_light.png"
+        },
+        {
+            "day": "Thursday",
+            "comment": "Showers",
+            "max_temp": {
+                "c": 7,
+                "f": 45
+            },
+            "min_temp": {
+                "c": 3,
+                "f": 37
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/rain_light.png"
+        },
+        {
+            "day": "Friday",
+            "comment": "Cloudy",
+            "max_temp": {
+                "c": 11,
+                "f": 52
+            },
+            "min_temp": {
+                "c": 2,
+                "f": 35
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/cloudy.png"
+        },
+        {
+            "day": "Saturday",
+            "comment": "Partly cloudy",
+            "max_temp": {
+                "c": 6,
+                "f": 43
+            },
+            "min_temp": {
+                "c": -1,
+                "f": 31
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/partly_cloudy.png"
+        },
+        {
+            "day": "Sunday",
+            "comment": "Partly cloudy",
+            "max_temp": {
+                "c": 5,
+                "f": 41
+            },
+            "min_temp": {
+                "c": 2,
+                "f": 36
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/partly_cloudy.png"
+        },
+        {
+            "day": "Monday",
+            "comment": "Mostly cloudy",
+            "max_temp": {
+                "c": 7,
+                "f": 44
+            },
+            "min_temp": {
+                "c": 4,
+                "f": 40
+            },
+            "iconURL": "https://ssl.gstatic.com/onebox/weather/48/partly_cloudy.png"
+        }
+    ],
+    "contact_author": {
+        "email": "communication.with.users@gmail.com",
+        "auth_note": "Mail me for feature requests, improvement, bug, help, ect... Please tell me if you want me to provide any other free easy-to-use API services"
+    },
+    "data_source": "https://www.google.com/search?lr=lang_en&q=weather+in+chicago"
+}

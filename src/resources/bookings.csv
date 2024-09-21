@@ -1,0 +1,11 @@
+totalPrice, depositPaid, checkIn, checkOut, additionalNeeds
+100,false,2022-04-10,2022-04-11,
+200,true,2022-04-15,2022-04-17,breakfast
+300,false,2022-04-30,2022-04-11,toddle bed
+400,false,2022-06-11,2022-6-14,wedding
+500,true,2022-06-29,2022-07-22,drinks
+600,false,2022-09-10,2022-09-13,food
+700,false,2022-07-04,2022-08-05,
+800,false,2022-08-13,2022-08-21,king-size bed
+900,false,2022-03-09,2022-04-11,flight
+1000,true,2022-12-22,2023-01-11,car

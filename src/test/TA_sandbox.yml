@@ -1,0 +1,106 @@
+# ASSERTS: npm install -g artillery-plugin-expect
+# METRIC-BY-ENDPOINT: npm install artillery-plugin-metrics-by-endpoint
+config:
+  target: "https://weatherdbi.herokuapp.com/data/weather"
+  tls:
+    rejectUnauthorized: false
+  ensure:
+    max: 1000
+    maxErrorRate: 10 # 10%
+  environments:
+    dev:
+      target: "https://api.genderize.io/"
+      phases:
+        - duration: 1
+          arrivalRate: 1
+      variables:
+        name:
+          - "Karlin"
+          - "Sven"
+    test:
+      target: "https://api.genderize.io/"
+      phases:
+        - duration: 1
+          arrivalRate: 3
+      variables:
+        name:
+          - "Sven"
+          - "Karlin"
+          - "DanTan"
+  variables:
+    agify: "https://api.agify.io/"
+    genderize: "https://api.genderize.io/"
+    nationalize: "https://api.nationalize.io/"
+    city:
+      - "Chicago"
+      - "Madrid"
+      - "Brussels"
+      - "Athens"
+  phases:
+    - duration: 60
+      arrivalRate: 2
+      name: Warm up
+    # - duration: 20
+    #   arrivalRate: 2
+    #   rampTo: 10
+    #   name: Ramp up load
+    # - duration: 60
+    #   arrivalRate: 10
+    #   name: Sustained load
+  payload:
+    path: "../resources/names.csv"
+    fields:
+      - "FirstName"
+      - "LastName"
+    order: sequence
+    skipHeader: true
+  plugins:
+    expect: {}
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+  processor: "../utils/helper-functions.js"
+scenarios:
+  - name: "WEIGHING - Predict Age"
+    weight: 60
+    flow:
+      - get:
+          url: "{{agify}}"
+          qs:
+            name: "{{FirstName}}"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: "age"
+          capture:
+            - json: "$.age"
+              as: "response_age"
+      - log: "{{FirstName}} {{LastName}} is {{response_age}} years old"
+  - afterResponse: "percentCalculation"
+    name: "WEIGHING - Predict Gender"
+    weight: 30
+    flow:
+      - get:
+          url: "{{genderize}}"
+          qs:
+            name: "{{FirstName}}"
+          capture:
+            - json: "$.gender"
+              as: "response_gender"
+      - log: "There is a {{probability}}% chance that {{FirstName}} {{LastName}} is a {{response_gender}}"
+  - afterResponse: "countryCalculation"
+    name: "WEIGHING - Predict Nationality"
+    weight: 10
+    flow:
+      - get:
+          url: "{{nationalize}}"
+          qs:
+            name: "{{FirstName}}"
+          capture:
+            - json: "$.country[0].country_id"
+              as: "response_country"
+      - log: "There is a {{probability}}% chance that {{FirstName}} {{LastName}} is from {{response_country}}"
+
+  # Store: artillery run -o reports/TA_sandbox src/test/TA_sandbox.yml
+  # Report: artillery report reports/TA_sandbox
+
+  # report viewer tool needs Node 14.18 or lower. Bug in Artillery 2.0

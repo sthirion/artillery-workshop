@@ -1,0 +1,212 @@
+# ASSERTS: npm install -g artillery-plugin-expect
+# METRIC-BY-ENDPOINT: npm install artillery-plugin-metrics-by-endpoint
+config:
+  target: "https://restful-booker.herokuapp.com"
+  tls:
+    rejectUnauthorized: false
+  environments:
+    load:
+      phases:
+        - name: "Started load test"
+          duration: 60
+          arrivalRate: 3
+      # ensure: #CICD
+      #   thresholds: # V2
+      #     # p99 of response time must be <250:
+      #     - "http.response_time.p99": 250
+      #     # p95 of response time must be <100:
+      #     - "http.response_time.p95": 100
+      #   conditions:
+      #     # Check that we generated 1000+ requests per second and that p95 is < 250ms
+      #     - expression: "http.response_time.p95 < 250 and http.request_rate > 1000"
+      ensure: # V1
+        max: 1000 
+        maxErrorRate: 10 # 10%
+    functional:
+      phases:
+        - name: "Started Functional Test"
+          duration: 1
+          arrivalCount: 1
+      plugins:
+        expect: {}
+
+  payload:
+    - path: "../resources/creds.csv"
+      fields:
+        - "userName"
+        - "password"
+      order: random #sequence
+      skipHeader: true
+
+    - path: "../resources/bookings.csv"
+      fields:
+        - totalPrice
+        - depositPaid
+        - checkIn
+        - checkOut
+        - additionalNeeds
+      order: random #sequence
+      skipHeader: true
+
+  processor: "../utils/helper-functions.js"
+
+before:
+  flow:
+    # Get a token
+    - post:
+        url: "/auth"
+        headers:
+          Accept: "application/json"
+        form:
+          username: "admin"
+          password: "password123"
+          # username: "{{userName}}"
+          # password: "{{password}}"
+        capture:
+          - json: "$.token"
+            as: token
+    # - log: "Token: {{token}}"
+
+scenarios:
+  - flow:
+    # Create a booking
+    - function: "testData"
+    - post:
+        url: "/booking"
+        headers:
+          Authorisation: "Bearer {{token}}"
+          Content-Type: "application/json"
+          Accept: "application/json"
+        json:
+          # firstname: "Jeanna"
+          # lastname: "Smith"
+          # totalprice: 999
+          # depositpaid: true
+          # bookingdates:
+          #   checkin: "2022-04-15"
+          #   checkout: "2022-04-18"
+          # additionalneeds: "Breakfast"
+          firstname: "{{firstName}}"
+          lastname: "{{lastName}}"
+          totalprice: "{{totalPrice}}"
+          depositpaid: "{{depositPaid}}"
+          bookingdates:
+            checkin: "{{checkIn}}"
+            checkout: "{{checkOut}}"
+          additionalneeds: "{{additionalNeeds}}"
+        expect:
+          - statusCode: 200
+          - contentType: json
+          - hasProperty: "bookingid"
+        capture:
+          - json: "$.bookingid"
+            as: bookingid
+    # - log: "Booking ID created: {{bookingid}}"
+
+    # Get the booking created
+    - get:
+        url: "/booking/{{bookingid}}"
+        headers:
+          Accept: "application/json"
+        capture:
+          - json: "$.firstname"
+            as: oldFirstName
+          - json: "$.lastname"
+            as: oldLastName
+        expect:
+          - statusCode: 200
+          - contentType: json
+          - equals:
+            - "{{oldFirstName}}"
+            - "{{firstName}}"
+          - equals:
+            - "{{oldLastName}}"
+            - "{{lastName}}"
+    # - log: "Got info for booking {{bookingid}}"
+
+    # Update a booking"
+    - put:
+        url: "/booking/{{bookingid}}"
+        headers:
+          Cookie: "token={{token}}"
+          Content-Type: "application/json"
+          Accept: "application/json"
+        json:
+          firstname: "Testaholics"
+          lastname: "Anonymous"
+          totalprice: "{{totalPrice}}"
+          depositpaid: "{{depositPaid}}"
+          bookingdates:
+            checkin: "{{checkIn}}"
+            checkout: "{{checkOut}}"
+          additionalneeds: "{{additionalNeeds}}"
+        capture:
+          - json: "$.firstname"
+            as: newFirstName
+          - json: "$.lastname"
+            as: newLastName
+        expect:
+          - statusCode: 200
+          - contentType: json
+          - equals:
+            - "{{newFirstName}}"
+            - "Testaholics"
+          - equals:
+            - "{{newLastName}}"
+            - "Anonymous"
+    # - log: "Booking {{bookingid}} updated"
+
+    # GET BOOKINGS by name
+    # afterResponse: "saveBookingIds"
+    - get:
+        url: "/booking"
+        headers:
+          Content-Type: "application/json"
+        qs:
+          firstname: "Testaholics"
+          lastname: "Anonymous"
+        expect:
+          - statusCode: 200
+          - contentType: json
+        capture:
+          - json: '$'
+            as: booking
+    # - log: "{{booking.length}} Bookings found"
+
+    # UPDATE The first Booking found
+    - function: "testData"
+    - put:
+        url: "/booking/{{booking[0].bookingid}}"
+        headers:
+          Cookie: "token={{token}}"
+          Content-Type: "application/json"
+          Accept: "application/json"
+        json:
+          firstname: "Testaholics"
+          lastname: "Anonymous"
+          totalprice: "{{totalPrice}}"
+          depositpaid: "{{depositPaid}}"
+          bookingdates:
+            checkin: "{{checkIn}}"
+            checkout: "{{checkOut}}"
+          additionalneeds: "{{additionalNeeds}}"
+        capture:
+          - json: "$.firstname"
+            as: newFirstName
+          - json: "$.lastname"
+            as: newLastName
+        expect:
+          - statusCode: 200
+          - contentType: json
+          - equals:
+            - "{{newFirstName}}"
+            - "Testaholics"
+          - equals:
+            - "{{newLastName}}"
+            - "Anonymous"
+    # - log: "Booking {{booking[0].bookingid}} updated"
+
+  # Run functional test: artillery run -q src/test/TA_complex.yml -e functional
+
+  # Run load test: artillery run -o reports/TA_complex src/test/TA_complex.yml -e load
+  # Report: artillery report reports/TA_complex

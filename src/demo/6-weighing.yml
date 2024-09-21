@@ -1,0 +1,26 @@
+config:
+  target: https://api.genderize.io
+  phases:
+    - name: "Showcasing 20/80 weighing"
+      duration: 100
+      arrivalRate: 1
+scenarios:
+  - name: "PETER"
+    weight: 80
+    flow:
+    - get:
+        url: "/"
+        qs:
+          name: "Peter"
+  - name: "PAN"
+    weight: 20
+    flow:
+    - get:
+        url: "/"
+        qs:
+          name: "Pan"
+
+  # Run: artillery run -o reports/report-weighing src/demo/6-weighing.yml
+  # Generate report: artillery report reports/report-weighing.json
+
+  # INFO: https://www.artillery.io/docs/guides/guides/test-script-reference#scenarios-section
